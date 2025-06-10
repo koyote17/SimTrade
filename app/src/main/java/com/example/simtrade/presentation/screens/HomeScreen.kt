@@ -16,12 +16,14 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.simtrade.presentation.viewmodel.CryptoViewModel
@@ -30,8 +32,17 @@ import com.example.simtrade.presentation.viewmodel.CryptoViewModel
 @Composable
 fun HomeScreen(viewModel: CryptoViewModel,
                onNavigateTo: (String) -> Unit) {
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchCryptos()
+    }
+
     val cryptoList by viewModel.cryptos.collectAsState()
     val top10 = cryptoList.sortedByDescending { it.currentPrice }.take(10)
+    val selectedCurrency by viewModel.selectedCurrency.collectAsState()
+
+   // var expanded by remember { mutableStateOf(false) }
+   // val currencies = listOf("usd", "eur", "gbp", "pln")
 
     Column(
         modifier = Modifier
@@ -51,7 +62,11 @@ fun HomeScreen(viewModel: CryptoViewModel,
         }
          Spacer(modifier = Modifier.height(16.dp))
 
-         Text("Top 10 Kryptowalut", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+         Text(modifier = Modifier.padding(16.dp),
+             textAlign = TextAlign.Center,
+             text = "Top 10 Kryptowalut",
+             fontSize = 20.sp,
+             fontWeight = FontWeight.SemiBold)
 
          LazyColumn(modifier = Modifier.weight(1F)) {
              items(top10) { coin ->
@@ -75,9 +90,7 @@ fun HomeScreen(viewModel: CryptoViewModel,
                              fontWeight = FontWeight.SemiBold,
                              color = Color(0xFF388E3C)
                          )
-
                      }
-
                  }
              }
          }
@@ -96,4 +109,5 @@ fun HomeScreen(viewModel: CryptoViewModel,
              }
          }
     }
+
 }

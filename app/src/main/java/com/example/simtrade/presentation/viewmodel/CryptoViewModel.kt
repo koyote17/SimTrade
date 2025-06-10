@@ -21,7 +21,7 @@ class CryptoViewModel(private val repository: CryptoRepository): ViewModel() {
 
     private val disposable = CompositeDisposable()
 
-    init {
+
         fun fetchCryptos(){
             disposable.add(
                 repository.getCryptos(_selectedCurrency.value)
@@ -34,6 +34,8 @@ class CryptoViewModel(private val repository: CryptoRepository): ViewModel() {
             )
         }
 
+    fun setCurrency(newCurrency: String){
+        _selectedCurrency.value = newCurrency
+        fetchCryptos()
     }
-
 }

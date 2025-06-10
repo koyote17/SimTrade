@@ -55,10 +55,11 @@ android {
 
 dependencies {
     //Navigation
-    implementation("androidx.navigation:navigation-compose:2.8.9")
+    implementation("androidx.navigation:navigation-compose:2.9.0")
+    implementation("androidx.compose.material:material-icons-extended:1.6.1")
 
     //Compose ViewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.0")
 
     // RxJava3
     implementation("io.reactivex.rxjava3:rxjava:3.1.8")

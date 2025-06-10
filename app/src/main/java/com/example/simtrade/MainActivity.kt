@@ -20,7 +20,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         FirebaseApp.initializeApp(this)
         setContent {
-            AppNavGraph()
+            SimTradeTheme {
+                AppNavGraph()
+            }
         }
     }
 }
