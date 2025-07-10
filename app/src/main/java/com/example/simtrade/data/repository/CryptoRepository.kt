@@ -9,4 +9,10 @@ class CryptoRepository(private val api: CoinApiService) {
     fun getCryptos(currency: String): Single<List<CryptoCurrency>>{
         return api.getTopCoins(vsCurrency = currency)
     }
+
+    fun getMarketChartLast24h(coinId: String, vsCurrency: String = "usd") =
+        api.getMarketChartLast24h(coinId, vsCurrency)
+
+    fun getExchangeRates() = api.getExchangeRates()
 }
+

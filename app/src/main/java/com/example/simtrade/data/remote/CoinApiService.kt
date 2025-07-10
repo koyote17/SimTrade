@@ -1,8 +1,11 @@
 package com.example.simtrade.data.remote
 
 import com.example.simtrade.data.model.CryptoCurrency
+import com.example.simtrade.data.model.ExchangeRateResponse
+import com.example.simtrade.data.model.MarketChartResponse
 import io.reactivex.rxjava3.core.Single
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 
@@ -16,4 +19,18 @@ fun getTopCoins(
     @Query("per_page") perPage: Int = 30,
     @Query("sparkline") sparkline: Boolean = false
 ): Single<List<CryptoCurrency>>
+
+    @GET("coins/{id}/market_chart")
+    fun getMarketChartLast24h(
+        @Path("id") coinId: String,
+        @Query("vs_currency") vsCurrency: String = "usd",
+        @Query("days") days: Int = 1
+    ): Single<MarketChartResponse>
+
+    @GET("simple/price")
+    fun getExchangeRates(
+        @Query("ids") ids: String = "usd",
+        @Query("vs_currencies") vsCurrencies: String = "pln,eur,gbp,uah"
+    ): Single<ExchangeRateResponse>
+
 }
