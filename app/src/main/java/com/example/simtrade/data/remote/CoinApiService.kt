@@ -13,11 +13,12 @@ interface CoinApiService {
 
     @GET("coins/markets")
 
-fun getTopCoins(
+fun getCoinMarkets(
     @Query("vs_currency") vsCurrency: String,
     @Query("order") order: String = "market_cap_desc",
-    @Query("per_page") perPage: Int = 30,
-    @Query("sparkline") sparkline: Boolean = false
+    @Query("per_page") perPage: Int = 300,
+    @Query("sparkline") sparkline: Boolean = false,
+    @Query("price_change_percentage") priceChangePercentage: String = "24h"
 ): Single<List<CryptoCurrency>>
 
     @GET("coins/{id}/market_chart")

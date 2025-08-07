@@ -27,27 +27,32 @@ import com.example.simtrade.presentation.screens.HomeScreen
 import com.example.simtrade.presentation.screens.LoginScreen
 import com.example.simtrade.presentation.viewmodel.AuthViewModel
 import com.example.simtrade.presentation.viewmodel.CryptoViewModel
+import androidx.compose.ui.platform.LocalContext
+import com.example.SimTradeApp
+import com.example.simtrade.presentation.screens.WalletDetailsScreen
 
 @Composable
-fun AppNavGraph(){
+fun AppNavGraph() {
     val navController = rememberNavController()
     val authViewModel = remember { AuthViewModel() }
-    val api = remember { RetrofitInstance.retrofit }
-    val cryptoRepository = remember { CryptoRepository(api) }
+
+    val context = LocalContext.current.applicationContext
+    val app = remember(context) { context as SimTradeApp }
+
+    // Używamy już zdefiniowanego w SimTradeApp repozytorium
+    val cryptoRepository = remember { app.cryptoRepository }
     val cryptoViewModel = remember { CryptoViewModel(cryptoRepository) }
 
     val isLoggedIn = remember { derivedStateOf { authViewModel.isLoggedIn } }
     var selectedItem by remember { mutableStateOf("home") }
 
-    if(!isLoggedIn.value) {
+    if (!isLoggedIn.value) {
         LoginScreen(viewModel = authViewModel) {
             navController.navigate("home") {
                 popUpTo("login") { inclusive = true }
             }
         }
     } else {
-
-
         Scaffold(
             bottomBar = {
                 NavigationBar {
@@ -78,11 +83,23 @@ fun AppNavGraph(){
                 modifier = Modifier.padding(innerPadding)
             ) {
                 composable("home") {
-                    HomeScreen(viewModel = cryptoViewModel) {
-                        navController.navigate(it)
-                    }
+                    HomeScreen(
+                        viewModel = cryptoViewModel,
+                        onNavigateToDetailsScreen = { navController.navigate("wallet_details") }
+                    )
                 }
-                composable("all_cryptos") { AllCryptosScreen() }
+                composable("wallet_details") {
+                    WalletDetailsScreen(
+                        viewModel = cryptoViewModel,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+                composable("all_cryptos") {
+                    AllCryptosScreen(
+                        viewModel = cryptoViewModel,
+                        onNavigateTo = { navController.navigate(it) }
+                    )
+                }
                 composable("buy_sell") { BuySellScreen() }
                 composable("history") { HistoryScreen() }
             }

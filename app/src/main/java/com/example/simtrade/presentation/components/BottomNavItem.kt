@@ -5,7 +5,6 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.rounded.DateRange
-import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.simtrade.data.model.BottomNavItem
 
 

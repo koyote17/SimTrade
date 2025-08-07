@@ -4,6 +4,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose") version "2.1.0"
 
     id("com.google.gms.google-services")
+    id("org.jetbrains.kotlin.kapt")
 }
 
 android {
@@ -63,6 +64,12 @@ dependencies {
 
     // RxJava3
     implementation("io.reactivex.rxjava3:rxjava:3.1.8")
+
+    // Room Database
+    implementation("androidx.room:room-runtime:2.7.2")
+    implementation("androidx.room:room-ktx:2.7.2")
+    kapt("androidx.room:room-compiler:2.7.2")
+
 
     // RxJava3 - Schdeulers
     implementation ("io.reactivex.rxjava3:rxandroid:3.0.2")

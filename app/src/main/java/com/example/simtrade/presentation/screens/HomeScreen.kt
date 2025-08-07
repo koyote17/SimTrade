@@ -4,9 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,22 +13,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.simtrade.presentation.components.CurrencySelector
+import com.example.simtrade.presentation.components.BalanceCard
 import com.example.simtrade.presentation.viewmodel.CryptoViewModel
 import com.example.simtrade.presentation.viewmodel.Result
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     viewModel: CryptoViewModel,
-    onNavigateTo: (String) -> Unit
+    onNavigateToDetailsScreen: () -> Unit
 ) {
-    val cryptoResult by viewModel.cryptos.collectAsState()
+    val cryptoResult by viewModel.top10Coins.collectAsState()
     val selectedCurrency by viewModel.selectedCurrency.collectAsState()
-    val balance by viewModel.convertedBalance.collectAsState()
+    val balance by viewModel.totalPortfolioValue.collectAsState()
 
-    var expanded by remember { mutableStateOf(false) }
     val supportedCurrencies = listOf("usd", "eur", "gbp", "pln", "uah")
 
+    LaunchedEffect(key1 = Unit) {
+        viewModel.fetchUser(1)
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -44,58 +44,20 @@ fun HomeScreen(
                 .padding(bottom = 8.dp),
             horizontalArrangement = Arrangement.End
         ) {
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded }
-            ) {
-                TextField(
-                    value = selectedCurrency.uppercase(),
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Currency") },
-                    trailingIcon = {
-                        Icon(
-                            imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
-                            contentDescription = "Dropdown"
-                        )
-                    },
-                    modifier = Modifier.menuAnchor().width(IntrinsicSize.Min),
-                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                    singleLine = true
-                )
-
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    supportedCurrencies.forEach { currency ->
-                        DropdownMenuItem(
-                            text = { Text(currency.uppercase()) },
-                            onClick = {
-                                expanded = false
-                                viewModel.setCurrency(currency)
-                            }
-                        )
-                    }
-                }
-            }
+            CurrencySelector(
+                selectedCurrency = selectedCurrency,
+                onCurrencySelected = { currency -> viewModel.setCurrency(currency) },
+                supportedCurrencies = supportedCurrencies
+            )
         }
 
-        Card(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF1E88E5))
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    "Balance: ${String.format("%.2f", balance)} ${selectedCurrency.uppercase()}",
-                    color = Color.White,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
+        BalanceCard(
+            balance = balance,
+            selectedCurrency = selectedCurrency,
+            onCardClick = onNavigateToDetailsScreen
+        )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         Text(
             modifier = Modifier.padding(16.dp),
@@ -107,14 +69,18 @@ fun HomeScreen(
 
         when (val result = cryptoResult) {
             is Result.Loading -> {
-                CircularProgressIndicator(modifier = Modifier.padding(top = 20.dp))
+                CircularProgressIndicator(modifier = Modifier
+                    .padding(top = 20.dp),
+                    trackColor = Color.Green)
             }
+
             is Result.Success -> {
                 val top10 = result.data.sortedByDescending { it.currentPrice }.take(10)
                 LazyColumn(modifier = Modifier.weight(1F)) {
                     items(top10) { coin ->
                         Card(
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp).clickable { },
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)
+                                .clickable { },
                             elevation = CardDefaults.cardElevation(6.dp)
                         ) {
                             Row(
@@ -127,7 +93,9 @@ fun HomeScreen(
                                     Text(coin.symbol, color = Color.Gray)
                                 }
                                 Text(
-                                    text = "${String.format("%.2f", coin.currentPrice)} ${selectedCurrency.uppercase()}",
+                                    text = "${
+                                        String.format("%.2f", coin.currentPrice)
+                                    } ${selectedCurrency.uppercase()}",
                                     fontWeight = FontWeight.SemiBold,
                                     color = Color(0xFF388E3C)
                                 )
@@ -136,6 +104,7 @@ fun HomeScreen(
                     }
                 }
             }
+
             is Result.Error -> {
                 Text(
                     text = "Error while loading data: ${result.message}",
@@ -148,5 +117,5 @@ fun HomeScreen(
 
         Spacer(Modifier.padding(16.dp))
 
-        }
     }
+}

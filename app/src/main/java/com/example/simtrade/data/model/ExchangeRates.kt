@@ -6,8 +6,8 @@ data class ExchangeRateResponse(
 )
 
 data class FiatRates(
-    val pln: Double,
-    val eur: Double,
-    val gbp: Double,
-    val uah: Double
+    val pln: Double = 1.0,
+    val eur: Double = 1.0,
+    val gbp: Double = 1.0,
+    val uah: Double = 1.0
 )

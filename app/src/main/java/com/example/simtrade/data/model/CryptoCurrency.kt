@@ -11,6 +11,8 @@ data class CryptoCurrency(
     @SerializedName("current_price")
     val currentPrice: Double,
     @SerializedName("price_change_percentage_24h")
-    val priceChange: Double,
-    @SerializedName("market_cap_change_percentage_24h")
-    val priceChangePercentage: Double)
+    val priceChangePercentage: Double,
+    @SerializedName("market_cap")
+    val marketCap: Double?,
+    @SerializedName("total_volume")
+    val totalVolume: Double?)
