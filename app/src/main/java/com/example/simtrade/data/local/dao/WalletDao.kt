@@ -25,6 +25,4 @@ interface WalletDao {
 
     @Update
     suspend fun updateWalletItem(wallet: WalletEntity)
-
-
 }

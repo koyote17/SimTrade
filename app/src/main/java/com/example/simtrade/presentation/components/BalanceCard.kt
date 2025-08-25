@@ -20,42 +20,47 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 
 @Composable
+
 fun BalanceCard(
     balance: Double,
     selectedCurrency: String,
-    onCardClick: () -> Unit // Nowy parametr: funkcja do obsługi kliknięcia
+    onCardClick: () -> Unit, // Nowy parametr: funkcja do obsługi kliknięcia
+    modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
+    Card(modifier = modifier
             .padding(vertical = 8.dp)
             .clickable { onCardClick() }, // Dodanie modyfikatora `clickable`
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+
     ) {
-        Row(
-            modifier = Modifier
+
+        Row(modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column {
+
+            Column(modifier = Modifier) {
                 Text(
                     text = "Saldo",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
+
                 Text(
                     text = String.format("%.2f %s", balance, selectedCurrency.uppercase()),
-                    style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold),
+                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
+
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = "Przejdź do szczegółów portfela",
                 tint = MaterialTheme.colorScheme.onPrimaryContainer
+
             )
         }
     }

@@ -51,7 +51,5 @@ class CryptoRepository(
     suspend fun updateWalletItem(wallet: WalletEntity) = walletDao.updateWalletItem(wallet)
     suspend fun insertWalletItem(wallet: WalletEntity) = walletDao.insertWalletItem(wallet)
 
-
-
 }
 

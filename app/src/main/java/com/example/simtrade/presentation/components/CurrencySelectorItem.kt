@@ -1,6 +1,7 @@
 package com.example.simtrade.presentation.components
 
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -32,6 +33,7 @@ fun CurrencySelector(
     var expanded by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(
+        modifier = Modifier.fillMaxWidth(0.4F),
         expanded = expanded,
         onExpandedChange = { expanded = !expanded }
     ) {

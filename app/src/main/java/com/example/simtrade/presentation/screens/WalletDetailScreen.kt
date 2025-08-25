@@ -51,7 +51,7 @@ fun WalletDetailsScreen(
                 BalanceCard(
                     balance = totalValue,
                     selectedCurrency = selectedCurrency,
-                    onCardClick = {} // Karta jest nieklikalna, bo jesteśmy na ekranie szczegółów
+                    onCardClick = {}
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }

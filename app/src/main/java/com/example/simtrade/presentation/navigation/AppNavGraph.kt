@@ -1,6 +1,7 @@
 package com.example.simtrade.presentation.navigation
 
 
+import HomeScreen
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -17,13 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.simtrade.data.remote.RetrofitInstance
-import com.example.simtrade.data.repository.CryptoRepository
 import com.example.simtrade.presentation.components.BottomNavItems
 import com.example.simtrade.presentation.screens.AllCryptosScreen
 import com.example.simtrade.presentation.screens.BuySellScreen
 import com.example.simtrade.presentation.screens.HistoryScreen
-import com.example.simtrade.presentation.screens.HomeScreen
 import com.example.simtrade.presentation.screens.LoginScreen
 import com.example.simtrade.presentation.viewmodel.AuthViewModel
 import com.example.simtrade.presentation.viewmodel.CryptoViewModel
@@ -97,7 +95,7 @@ fun AppNavGraph() {
                 composable("all_cryptos") {
                     AllCryptosScreen(
                         viewModel = cryptoViewModel,
-                        onNavigateTo = { navController.navigate(it) }
+                        onNavigateToDetailScreen = { navController.navigate("wallet_details") }
                     )
                 }
                 composable("buy_sell") { BuySellScreen() }
