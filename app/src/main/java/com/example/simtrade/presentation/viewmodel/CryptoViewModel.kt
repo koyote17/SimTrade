@@ -19,6 +19,15 @@ sealed class Result<out T> {
     data object Loading : Result<Nothing>()
 }
 
+enum class SortCriteria {
+    NONE,
+    PRICE_ASC, PRICE_DESC,
+    NAME_ASC,
+    NAME_DESC,
+    CHANGE_24H_ASC,
+    CHANGE_24H_DESC
+}
+
 class CryptoViewModel(private val repository: CryptoRepository) : ViewModel() {
 
     private val _selectedCurrency = MutableStateFlow("usd")
@@ -52,6 +61,45 @@ class CryptoViewModel(private val repository: CryptoRepository) : ViewModel() {
 
     private val _showAddFundsDialog = MutableStateFlow(false)
     val showAddFundsDialog: StateFlow<Boolean> = _showAddFundsDialog.asStateFlow()
+
+    private val _searchText = MutableStateFlow("")
+    val searchText: StateFlow<String> = _searchText.asStateFlow()
+
+    private val _sortCriteria = MutableStateFlow(SortCriteria.NONE)
+    val sortCriteria: StateFlow<SortCriteria> = _sortCriteria.asStateFlow()
+
+    val filteredAndSortedCryptos: StateFlow<Result<List<CryptoCurrency>>> =
+        _allCryptos.combine(_searchText) { cryptos, text ->
+            if (cryptos is Result.Success) {
+                val filteredList = if (text.isBlank()) {
+                    cryptos.data
+                } else {
+                    cryptos.data.filter { coin ->
+                        coin.name.contains(text, ignoreCase = true) ||
+                                coin.symbol.contains(text, ignoreCase = true)
+                    }
+                }
+                Result.Success(filteredList)
+            } else {
+                cryptos
+            }
+        }.combine(_sortCriteria) { filteredResult, criteria ->
+            if (filteredResult is Result.Success) {
+                val sortedList = when (criteria) {
+                    SortCriteria.NAME_ASC -> filteredResult.data.sortedBy { it.name }
+                    SortCriteria.NAME_DESC -> filteredResult.data.sortedByDescending { it.name }
+                    SortCriteria.PRICE_ASC -> filteredResult.data.sortedBy { it.currentPrice }
+                    SortCriteria.PRICE_DESC -> filteredResult.data.sortedByDescending { it.currentPrice }
+                    SortCriteria.CHANGE_24H_ASC -> filteredResult.data.sortedBy { it.priceChangePercentage }
+                    SortCriteria.CHANGE_24H_DESC -> filteredResult.data.sortedByDescending { it.priceChangePercentage }
+                    else -> filteredResult.data
+                }
+                Result.Success(sortedList)
+            } else {
+                filteredResult
+            }
+        }.stateIn(viewModelScope, SharingStarted.Lazily, Result.Loading)
+
 
     val totalPortfolioValue: StateFlow<Double> = combine(
         _user,
@@ -165,6 +213,14 @@ class CryptoViewModel(private val repository: CryptoRepository) : ViewModel() {
 
     fun setCurrency(currency: String) {
         _selectedCurrency.value = currency.lowercase()
+    }
+
+    fun setSearchText(text: String) {
+        _searchText.value = text
+    }
+
+    fun setSortCriteria(criteria: SortCriteria) {
+        _sortCriteria.value = criteria
     }
 
     private fun getRateForCurrency(currency: String, rates: FiatRates): Double {

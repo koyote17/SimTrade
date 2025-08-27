@@ -57,6 +57,7 @@ import com.example.simtrade.presentation.components.CurrencySelector
 
 import com.example.simtrade.presentation.viewmodel.CryptoViewModel
 import com.example.simtrade.presentation.viewmodel.Result
+import com.example.simtrade.presentation.viewmodel.SortCriteria
 
 @Composable
 fun AllCryptosScreen(viewModel: CryptoViewModel,
@@ -67,6 +68,11 @@ fun AllCryptosScreen(viewModel: CryptoViewModel,
     val balance by viewModel.totalPortfolioValue.collectAsState()
 
     var currencySelectorExpanded by remember { mutableStateOf(false) }
+
+    val filteredAndSortedCryptos by viewModel.filteredAndSortedCryptos.collectAsState()
+    var searchTextValue by remember { mutableStateOf("") }
+    var sortMenuExpanded by remember { mutableStateOf(false) }
+
 
     Column(modifier = Modifier
             .fillMaxSize()
@@ -123,8 +129,11 @@ fun AllCryptosScreen(viewModel: CryptoViewModel,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             OutlinedTextField(
-                value = "",
-                onValueChange = { },
+                value = searchTextValue,
+                onValueChange = {
+                    searchTextValue = it
+                    viewModel.setSearchText(it)
+                },
                 label = { Text("Search by name or symbol") },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
                 modifier = Modifier
@@ -135,7 +144,6 @@ fun AllCryptosScreen(viewModel: CryptoViewModel,
             )
         }
 
-        // Pasek sortowania pozostaje w osobnym wierszu
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -144,8 +152,51 @@ fun AllCryptosScreen(viewModel: CryptoViewModel,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text("Sort by: ", fontWeight = FontWeight.Bold)
-            IconButton(onClick = { }) {
-                Icon(Icons.Default.Sort, contentDescription = "Sort")
+            Box {
+                IconButton(onClick = { sortMenuExpanded = true }) {
+                    Icon(Icons.Default.Sort, contentDescription = "Sort")
+                }
+                DropdownMenu(
+                    expanded = sortMenuExpanded,
+                    onDismissRequest = { sortMenuExpanded = false}
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Price ASC") },
+                        onClick = {
+                            viewModel.setSortCriteria(SortCriteria.PRICE_ASC)
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Price DESC") },
+                        onClick = {
+                            viewModel.setSortCriteria(SortCriteria.PRICE_DESC)
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Name A-Z") },
+                        onClick = {
+                            viewModel.setSortCriteria(SortCriteria.NAME_ASC)
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Name Z-A") },
+                        onClick = {
+                            viewModel.setSortCriteria(SortCriteria.NAME_DESC)
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Price change in 24H ASC") },
+                        onClick = {
+                            viewModel.setSortCriteria(SortCriteria.CHANGE_24H_ASC)
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Price change in 24H DESC") },
+                        onClick = {
+                            viewModel.setSortCriteria(SortCriteria.CHANGE_24H_DESC)
+                        }
+                    )
+                }
             }
         }
 
@@ -155,7 +206,7 @@ fun AllCryptosScreen(viewModel: CryptoViewModel,
                 .fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            when (val result = allCryptoResult) {
+            when (val result = filteredAndSortedCryptos) {
                 is Result.Loading -> {
                     CircularProgressIndicator(
                         modifier = Modifier
@@ -166,7 +217,6 @@ fun AllCryptosScreen(viewModel: CryptoViewModel,
                 is Result.Success -> {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         items(result.data) { coin ->
-                            // Zmiana: implementacja elementu listy bezpośrednio tutaj, zgodnie z pierwotnym stylem
                             val favCryptoIds by viewModel.favCryptoIds.collectAsState()
                             val isCoinFavorite = favCryptoIds.contains(coin.id)
                             Card(

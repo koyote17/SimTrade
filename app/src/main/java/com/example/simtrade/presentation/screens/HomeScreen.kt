@@ -121,7 +121,7 @@ fun HomeScreen(
                             ) {
                                 Column {
                                     Text(coin.name, fontWeight = FontWeight.Bold)
-                                    Text(coin.symbol, color = Color.Gray)
+                                    Text(coin.symbol.uppercase(), color = Color.Gray)
                                 }
                                 Text(
                                     text = "${String.format("%.2f", coin.currentPrice)} ${selectedCurrency.uppercase()}",
